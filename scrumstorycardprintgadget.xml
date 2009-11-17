@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Module>
+	<ModulePrefs title="Scrum Story Card Print" />
+	<Content type="html">
+		<![CDATA[
+			
+			<script src="http://www.google.com/jsapi" type="text/javascript"></script>
+			<div id="tablediv" style="overflow: auto;"><img src="http://www.google.com/ig/images/spinner.gif" /></div>
+			
+			<script>
+				var gadgetHelper = null;
+				_IG_RegisterOnloadHandler(loadVisualizationAPI);
+				
+				function loadVisualizationAPI() {
+					google.load("visualization","1");
+					google.setOnLoadCallback(sendQuery);
+				}
+				
+				function sendQuery() {
+					var prefs = new _IG_Prefs(); //User prefs
+					gadgetHelper = new google.visualization.GadgetHelper();
+					var query = gadgetHelper.createQueryFromPrefs(prefs);
+					query.send(handleQueryResponse);
+				}
+				
+				function handleQueryResponse(response) {
+					if(!gadgetHelper.validateResponse(response)) {
+						return; //default error handling was done, so just exit
+					}
+					
+					var data = response.getDataTable();
+					var html = [];
+					html.push('Looking for the secret word\n');
+					
+					for (var row=0; row < data.getNumberOfRows(); row++) {
+						for (var col=0; col < data.getNumberOfColumns(); col++) {
+							var formattedValue = data.getFormattedValue(row,col);
+							formattedValue = escapeHtml(formattedValue);
+							
+							if(formattedValue == 'world') {
+								html.push('<span style="color:red; font-size:24pt; font-weight:bold;">');
+								html.push(formattedValue);
+								html.push('</span>');
+							} else {
+								html.push(formattedValue);
+							}
+						html.push('\n');
+						}
+					}
+					
+					var tableDiv = _gel('tablediv');
+					tableDiv.innerHTML = html.join('');
+					tableDiv.style.width = document.body.clientWidth + 'px';
+					tableDiv.style.height = document.body.clientHeight + 'px';
+				}
+			
+				function escapeHtml(text) {
+					if(text == null) {
+						return '';
+					}
+					return _hesc(text);
+				}
+			</script>
+			
+		]]>
+	</Content>
+</Module>
